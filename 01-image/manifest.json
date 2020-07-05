@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "name": "vultr",
+      "builder_type": "vultr",
+      "build_time": 1593929951,
+      "files": null,
+      "artifact_id": "51b5f016ec8b1",
+      "packer_run_uuid": "c278c407-ec47-e354-0917-7949a7a155e2",
+      "custom_data": null
+    }
+  ],
+  "last_run_uuid": "c278c407-ec47-e354-0917-7949a7a155e2"
+}

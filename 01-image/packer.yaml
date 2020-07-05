@@ -1,0 +1,47 @@
+variables:
+  vultr_api_key: "{{ env `VULTR_API_KEY` }}"
+builders:
+  - type: vultr
+    api_key: "{{ user `vultr_api_key` }}"
+    snapshot_description: "Ubuntu 20.04 cloud-init enabled"
+    region_id: "19" # Sydney https://api.vultr.com/v1/regions/list
+    plan_id: "202" # 2GB Ram, 55GB SSD, 1 cpu https://api.vultr.com/v1/plans/list?type=vc2
+    os_id: "387" # ubuntu 20.04, https://api.vultr.com/v1/os/list
+    ssh_username: root
+    state_timeout: 15m
+
+provisioners:
+  - type: shell
+    script: instance-scripts/01-install.sh
+
+  - type: file
+    source: instance-scripts/02-cloud-config.yaml
+    destination: /tmp/cloud-config.yaml
+  
+  - type: shell
+    inline: |
+      set -e
+      cloud-init -f /tmp/cloud-config.yaml modules --mode init
+      cloud-init -f /tmp/cloud-config.yaml modules --mode config
+      cloud-init -f /tmp/cloud-config.yaml modules --mode final
+
+  - type: file
+    source: instance-files/DataSourceVultr.py
+    destination: /usr/lib/python3/dist-packages/cloudinit/sources/DataSourceVultr.py
+
+  - type: file
+    source: instance-files/99_vultr.cfg
+    destination: /etc/cloud/cloud.cfg.d/99_vultr.cfg
+
+  - type: shell
+    inline: |
+      set -e
+      cloud-init clean -s -l
+      systemctl enable cloud-init
+      systemctl enable cloud-config
+      systemctl enable cloud-final
+
+post-processors:
+  - type: manifest
+    output: manifest.json
+  

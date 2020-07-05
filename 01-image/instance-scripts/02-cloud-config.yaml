@@ -1,0 +1,9 @@
+package_upgrade: true
+
+ssh_deletekeys: true
+ssh_pwauth: false
+
+disable_root: true
+
+users:
+  - default
